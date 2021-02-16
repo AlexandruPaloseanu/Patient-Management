@@ -1,4 +1,4 @@
-Java application for the management of a medical enterprise. The application is made using Gradle and Java Swing, and makes use of Databases (SQL).
+Java application for the management of a medical enterprise. The application is made using Gradle and Java Swing, and makes use of Databases (SQL). I have made a short (9 min.) video presentation for the application. This can be viewed following the link: https://youtu.be/P_703i3Mfk0
 
 The application has two types of users: patients and medics.
 
