@@ -909,6 +909,11 @@ public class MedicScreen extends JFrame{
                             }
                         }
 
+                        leftPanel.removeAll();
+                        leftPanel.setBounds(0,100, 500, 700);
+                        leftPanel.setBackground(new Color(229, 224, 105));
+                        leftPanel.setLayout(null);
+                        leftPanel.repaint();
 
                         showAppointmentsTable();
 
@@ -969,8 +974,8 @@ public class MedicScreen extends JFrame{
 
     public static void main(String[] args) throws SQLException {
 
-        String username = "alexandru.paloseanu";
-        MedicScreen medicScreen = new MedicScreen(username);
+        //String username = "alexandru.paloseanu";
+        //MedicScreen medicScreen = new MedicScreen(username);
 
     }
 }
