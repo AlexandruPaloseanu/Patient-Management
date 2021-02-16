@@ -658,6 +658,13 @@ public class MedicScreen extends JFrame{
                             }
                         }
 
+                        leftPanel.removeAll();
+                        leftPanel.setBounds(0,100, 500, 700);
+                        leftPanel.setBackground(new Color(229, 224, 105));
+                        leftPanel.setLayout(null);
+                        rightPanel.setLayout(null);
+                        leftPanel.repaint();
+
                         initializePatientSheetTable();
 
                     }
@@ -705,6 +712,14 @@ public class MedicScreen extends JFrame{
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();
                 }
+
+
+                leftPanel.removeAll();
+                leftPanel.setBounds(0,100, 500, 700);
+                leftPanel.setBackground(new Color(229, 224, 105));
+                leftPanel.setLayout(null);
+                rightPanel.setLayout(null);
+                leftPanel.repaint();
 
                 initializePatientSheetTable();
             }
