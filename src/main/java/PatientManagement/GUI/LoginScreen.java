@@ -79,8 +79,7 @@ public class LoginScreen extends JFrame {
             "You have introduced an incorrect username or", SwingConstants.CENTER);
 
     private JLabel wrongCombination2 = new JLabel(
-            "password. Please try again.", SwingConstants.CENTER
-    );
+            "password. Please try again.", SwingConstants.CENTER);
 
 
     private String username = null;
