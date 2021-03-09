@@ -10,13 +10,13 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
 
-import PatientManagement.Repository.Repository;
 
 public class MedicScreen extends JFrame{
+
+    private Services services = null;
 
     private String medicName = null;
     private String username = null;
@@ -110,26 +110,20 @@ public class MedicScreen extends JFrame{
 
         List<Appointment> appointmentList;
 
-        try {
+        appointmentList = services.getMedicAppointments(username);
 
-            appointmentList = Repository.getMedicAppointments(username);
+        if (appointmentList.size() < model.getRowCount()) {
 
-            if (appointmentList.size() < model.getRowCount()) {
+            for (int i = 0; i < appointmentList.size(); i++) {
 
-                for (int i = 0; i < appointmentList.size(); i++) {
-
-                    model.setValueAt(appointmentList.get(i).getAppointment_id(), i, 0);
-                    model.setValueAt(appointmentList.get(i).getPatient().getLast_name(), i, 1);
-                    model.setValueAt(appointmentList.get(i).getPatient().getFirst_name(), i, 2);
-                    model.setValueAt(appointmentList.get(i).getAppointment_date() + " " + appointmentList.get(i).getAppointment_time(), i, 3);
-                    model.setValueAt(appointmentList.get(i).getAppointment_status(), i, 4);
+                model.setValueAt(appointmentList.get(i).getAppointment_id(), i, 0);
+                model.setValueAt(appointmentList.get(i).getPatient().getLast_name(), i, 1);
+                model.setValueAt(appointmentList.get(i).getPatient().getFirst_name(), i, 2);
+                model.setValueAt(appointmentList.get(i).getAppointment_date() + " " + appointmentList.get(i).getAppointment_time(), i, 3);
+                model.setValueAt(appointmentList.get(i).getAppointment_status(), i, 4);
 
 
-                }
             }
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
 
     }
@@ -178,27 +172,21 @@ public class MedicScreen extends JFrame{
 
         List<PatientSheet> patientSheetList;
 
-        try {
+        patientSheetList = services.getMedicPatientSheets(username);
 
-            patientSheetList = Repository.getMedicPatientSheets(username);
-
-            if (patientSheetList.size() < model.getRowCount()) {
+        if (patientSheetList.size() < model.getRowCount()) {
 
 
-                for (int i = 0; i < patientSheetList.size(); i++) {
+            for (int i = 0; i < patientSheetList.size(); i++) {
 
-                    model.setValueAt(patientSheetList.get(i).getPatient().getLast_name(), i, 0);
-                    model.setValueAt(patientSheetList.get(i).getPatient().getFirst_name(), i, 1);
-                    model.setValueAt(patientSheetList.get(i).getDiagnosis(), i, 2);
-                    model.setValueAt(patientSheetList.get(i).getTreatment(), i, 3);
+                model.setValueAt(patientSheetList.get(i).getPatient().getLast_name(), i, 0);
+                model.setValueAt(patientSheetList.get(i).getPatient().getFirst_name(), i, 1);
+                model.setValueAt(patientSheetList.get(i).getDiagnosis(), i, 2);
+                model.setValueAt(patientSheetList.get(i).getTreatment(), i, 3);
 
-                }
             }
-
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
+
 
     }
 
@@ -241,11 +229,7 @@ public class MedicScreen extends JFrame{
 
         List<PatientSheet> patientSheets = null;
 
-        try {
-            patientSheets = Repository.getMedicPatientSheets(username);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        patientSheets = services.getMedicPatientSheets(username);
 
         String[] patientSheetNames = new String[patientSheets.size()];
 
@@ -283,7 +267,7 @@ public class MedicScreen extends JFrame{
 
                 frame.dispose();
 
-                LoginScreen loginScreen = new LoginScreen();
+                LoginScreen loginScreen = new LoginScreen(services);
 
             }
         });
@@ -316,11 +300,7 @@ public class MedicScreen extends JFrame{
 
                         List<Patient> patients = null;
 
-                        try {
-                            patients = Repository.getPatients();
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        patients = services.getPatients();
 
                         String[] patientNames = new String[patients.size()];
 
@@ -390,11 +370,7 @@ public class MedicScreen extends JFrame{
 
                         List<PatientSheet> patientSheets = null;
 
-                        try {
-                            patientSheets = Repository.getMedicPatientSheets(username);
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        patientSheets = services.getMedicPatientSheets(username);
 
                         String[] patientSheetNames = new String[patientSheets.size()];
 
@@ -591,11 +567,7 @@ public class MedicScreen extends JFrame{
 
                             } else {
 
-                                try {
-                                    Repository.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
 
                                 rightPanel.add(successfulModificationLabel);
                                 successfulModificationLabel.setBounds(50, 600, 350, 50);
@@ -618,11 +590,7 @@ public class MedicScreen extends JFrame{
 
                                 newTreatment = null;
 
-                                try {
-                                    Repository.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
 
                                 rightPanel.add(successfulModificationLabel);
                                 successfulModificationLabel.setBounds(50, 600, 350, 50);
@@ -644,11 +612,7 @@ public class MedicScreen extends JFrame{
 
                                 newDiagnosis = null;
 
-                                try {
-                                    Repository.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.modifyPatientSheet(sheetID, newDiagnosis, newTreatment);
 
                                 rightPanel.add(successfulModificationLabel);
                                 successfulModificationLabel.setBounds(50, 600, 350, 50);
@@ -693,24 +657,18 @@ public class MedicScreen extends JFrame{
                 String treatment = treatmentTextArea.getText();
 
 
-                try {
+                if (services.addPatientSheet(medicNameFinal, patientName, diagnosis, treatment)) {
 
-                    if (Repository.addPatientSheet(medicNameFinal, patientName, diagnosis, treatment)) {
+                    rightPanel.add(patientSheetAddedLabel);
+                    patientSheetAddedLabel.setBounds(50, 600, 350, 50);
+                    patientSheetAddedLabel.setForeground(Color.GREEN);
 
-                        rightPanel.add(patientSheetAddedLabel);
-                        patientSheetAddedLabel.setBounds(50, 600, 350, 50);
-                        patientSheetAddedLabel.setForeground(Color.GREEN);
+                } else {
 
-                    } else {
+                    rightPanel.add(patientSheetNotAddedLabel);
+                    patientSheetNotAddedLabel.setBounds(50, 600, 350, 50);
+                    patientSheetNotAddedLabel.setForeground(Color.RED);
 
-                        rightPanel.add(patientSheetNotAddedLabel);
-                        patientSheetNotAddedLabel.setBounds(50, 600, 350, 50);
-                        patientSheetNotAddedLabel.setForeground(Color.RED);
-
-                    }
-
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
                 }
 
 
@@ -741,11 +699,7 @@ public class MedicScreen extends JFrame{
 
                 List<Appointment> appointmentList = null;
 
-                try {
-                    appointmentList = Repository.getMedicAppointments(username);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
+                appointmentList = services.getMedicAppointments(username);
 
                 String[] appointments = new String[appointmentList.size()];
 
@@ -789,11 +743,7 @@ public class MedicScreen extends JFrame{
 
                         List<Appointment> appointmentList2 = null;
 
-                        try {
-                            appointmentList2 = Repository.getMedicAppointments(username);
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        appointmentList2 = services.getMedicAppointments(username);
 
                         String status = null;
 
@@ -872,11 +822,7 @@ public class MedicScreen extends JFrame{
 
                             if (appointmentDoneBox.isSelected()) {
 
-                                try {
-                                    Repository.markAppointment(appID, "TRUE");
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.markAppointment(appID, "TRUE");
 
                                 for (int i = 0; i < appointments.length; i++) {
 
@@ -890,11 +836,7 @@ public class MedicScreen extends JFrame{
 
                             } else if (appointmentNotDoneBox.isSelected()) {
 
-                                try {
-                                    Repository.markAppointment(appID, "FALSE");
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.markAppointment(appID, "FALSE");
 
                                 for (int i = 0; i < appointments.length; i++) {
 
@@ -929,10 +871,12 @@ public class MedicScreen extends JFrame{
     }
 
 
-    public MedicScreen (String username) throws SQLException {
+    public MedicScreen (Services services, String username) {
 
+
+        this.services = services;
         this.username = username;
-        this.medicName = Services.getMedicName(username);
+        this.medicName = services.getMedicName(username);
 
         frame.setTitle("Medic Screen");
         frame.setSize(1000,800);
@@ -972,10 +916,8 @@ public class MedicScreen extends JFrame{
     }
 
 
-    public static void main(String[] args) throws SQLException {
+    public static void main(String[] args) {
 
-        //String username = "alexandru.paloseanu";
-        //MedicScreen medicScreen = new MedicScreen(username);
 
     }
 }

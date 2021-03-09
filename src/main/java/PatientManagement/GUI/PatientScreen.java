@@ -3,7 +3,6 @@ package PatientManagement.GUI;
 import PatientManagement.BaseClasses.Appointment;
 import PatientManagement.BaseClasses.Medic;
 import PatientManagement.BaseClasses.PatientSheet;
-import PatientManagement.Repository.Repository;
 import PatientManagement.Services.Services;
 
 import javax.swing.*;
@@ -11,18 +10,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.MonthDay;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 public class PatientScreen extends JFrame{
+
+    private Services services = null;
 
     private String username = null;
     private String patientName = null;
@@ -116,30 +111,24 @@ public class PatientScreen extends JFrame{
         scrollPaneAppointments.setBounds(0, 0, 500, 670);
 
 
-        try {
+        appointmentList = services.getPatientAppointments(username);
 
-            appointmentList = Repository.getPatientAppointments(username);
+        if (appointmentList.size() < model.getRowCount()) {
 
-            if (appointmentList.size() < model.getRowCount()) {
+            int count = 0;
 
-                int count = 0;
+            for (int i = 0; i < appointmentList.size(); i++) {
 
-                for (int i = 0; i < appointmentList.size(); i++) {
+                count++;
+                String medicName = appointmentList.get(i).getMedic().getLast_name() + " " + appointmentList.get(i).getMedic().getFirst_name();
 
-                    count++;
-                    String medicName = appointmentList.get(i).getMedic().getLast_name() + " " + appointmentList.get(i).getMedic().getFirst_name();
+                model.setValueAt(count, i, 0);
+                model.setValueAt(medicName, i, 1);
+                model.setValueAt(appointmentList.get(i).getAppointment_date() , i, 2);
+                model.setValueAt(appointmentList.get(i).getAppointment_time() , i, 3);
+                model.setValueAt(appointmentList.get(i).getAppointment_status() , i, 4);
 
-                    model.setValueAt(count, i, 0);
-                    model.setValueAt(medicName, i, 1);
-                    model.setValueAt(appointmentList.get(i).getAppointment_date() , i, 2);
-                    model.setValueAt(appointmentList.get(i).getAppointment_time() , i, 3);
-                    model.setValueAt(appointmentList.get(i).getAppointment_status() , i, 4);
-
-                }
             }
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
         }
 
 
@@ -180,13 +169,7 @@ public class PatientScreen extends JFrame{
 
     private void initializeBoxPatientSheets () {
 
-        try {
-
-            patientSheetList = Repository.getPatientPatientSheets(username);
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        patientSheetList = services.getPatientPatientSheets(username);
 
         String[] patientSheets = new String[patientSheetList.size()];
 
@@ -220,13 +203,7 @@ public class PatientScreen extends JFrame{
 
         List<Medic> medicList = null;
 
-        try {
-
-            medicList = Repository.getMedics();
-
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        medicList = services.getMedics();
 
         String[] medics = new String[medicList.size()];
 
@@ -263,7 +240,7 @@ public class PatientScreen extends JFrame{
     }
 
 
-    private void initializeBoxTimeAddApp () throws SQLException {
+    private void initializeBoxTimeAddApp () {
 
         String selectedDay = (String) comboBoxDay.getSelectedItem();
         String[] selectedDayArray = selectedDay.split(", ");
@@ -291,11 +268,11 @@ public class PatientScreen extends JFrame{
         String[] medicSelectionArray = medicSelection.split(", ");
         int medicID = Integer.parseInt(medicSelectionArray[0]);
 
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "10:00:00")) timeSlots.add("10:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "12:00:00")) timeSlots.add("12:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "14:00:00")) timeSlots.add("14:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "16:00:00")) timeSlots.add("16:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "18:00:00")) timeSlots.add("18:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "10:00:00")) timeSlots.add("10:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "12:00:00")) timeSlots.add("12:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "14:00:00")) timeSlots.add("14:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "16:00:00")) timeSlots.add("16:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "18:00:00")) timeSlots.add("18:00");
 
         String[] timeSlotsArray = timeSlots.toArray(new String[timeSlots.size()]);
 
@@ -304,7 +281,7 @@ public class PatientScreen extends JFrame{
 
     }
 
-    private void initializeBoxTimeModifyApp () throws SQLException {
+    private void initializeBoxTimeModifyApp ()  {
 
         String selectedDay = (String) comboBoxDay.getSelectedItem();
         String[] selectedDayArray = selectedDay.split(", ");
@@ -335,11 +312,11 @@ public class PatientScreen extends JFrame{
         int medicID = appointmentList.get(appNr-1).getMedic().getMedic_id();
 
 
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "10:00:00")) timeSlots.add("10:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "12:00:00")) timeSlots.add("12:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "14:00:00")) timeSlots.add("14:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "16:00:00")) timeSlots.add("16:00");
-        if (Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "18:00:00")) timeSlots.add("18:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "10:00:00")) timeSlots.add("10:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "12:00:00")) timeSlots.add("12:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "14:00:00")) timeSlots.add("14:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "16:00:00")) timeSlots.add("16:00");
+        if (services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, "18:00:00")) timeSlots.add("18:00");
 
         String[] timeSlotsArray = timeSlots.toArray(new String[timeSlots.size()]);
 
@@ -358,7 +335,7 @@ public class PatientScreen extends JFrame{
 
                 frame.dispose();
 
-                LoginScreen loginScreen = new LoginScreen();
+                LoginScreen loginScreen = new LoginScreen(services);
 
             }
         });
@@ -525,11 +502,7 @@ public class PatientScreen extends JFrame{
                                         labelSelectTime.setBounds(260, 200, 190, 50);
 
 
-                                        try {
-                                            initializeBoxTimeAddApp();
-                                        } catch (SQLException throwables) {
-                                            throwables.printStackTrace();
-                                        }
+                                        initializeBoxTimeAddApp();
 
                                         rightPanel.add(comboBoxTime);
                                         comboBoxTime.setBounds(260, 250, 190, 50);
@@ -550,11 +523,7 @@ public class PatientScreen extends JFrame{
 
                                                 rightPanel.remove(comboBoxTime);
 
-                                                try {
-                                                    initializeBoxTimeAddApp();
-                                                } catch (SQLException throwables) {
-                                                    throwables.printStackTrace();
-                                                }
+                                                initializeBoxTimeAddApp();
 
                                                 rightPanel.add(comboBoxTime);
                                                 comboBoxTime.setBounds(260, 250, 190, 50);
@@ -612,30 +581,18 @@ public class PatientScreen extends JFrame{
 
                             if (true) {
 
-                                try {
-                                    condition = Services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, time);
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                condition = services.checkDoctorTimeAvailability(medicID, month, dayOfMonth, time);
 
                             }
 
                             if (condition) {
 
-                                try {
-                                    Repository.addAppointment(username, medicID, appointmentDate, time);
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                services.addAppointment(username, medicID, appointmentDate, time);
 
                                 rightPanel.remove(comboBoxTime);
                                 rightPanel.repaint();
 
-                                try {
-                                    initializeBoxTimeAddApp();
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                initializeBoxTimeAddApp();
 
                                 rightPanel.add(comboBoxTime);
                                 comboBoxTime.setBounds(260, 250, 190, 50);
@@ -772,11 +729,7 @@ public class PatientScreen extends JFrame{
                         String[] selectionArray2 = selection2.split(" ");
                         int appNr = (Integer.parseInt(selectionArray2[1])) - 1;
 
-                        try {
-                            Repository.deleteAppointment(appointmentList.get(appNr).getAppointment_id());
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
+                        services.deleteAppointment(appointmentList.get(appNr).getAppointment_id());
 
                         rightPanel.remove(comboBoxAppointments);
 
@@ -842,11 +795,7 @@ public class PatientScreen extends JFrame{
 
                                 rightPanel.repaint();
 
-                                try {
-                                    initializeBoxTimeModifyApp();
-                                } catch (SQLException throwables) {
-                                    throwables.printStackTrace();
-                                }
+                                initializeBoxTimeModifyApp();
 
                                 rightPanel.add(comboBoxTime);
                                 comboBoxTime.setBounds(260, 250, 190, 50);
@@ -860,11 +809,7 @@ public class PatientScreen extends JFrame{
                                         rightPanel.remove(labelAppointmentModified);
                                         if (!Objects.isNull(comboBoxTime)) rightPanel.remove(comboBoxTime);
 
-                                        try {
-                                            initializeBoxTimeModifyApp();
-                                        } catch (SQLException throwables) {
-                                            throwables.printStackTrace();
-                                        }
+                                        initializeBoxTimeModifyApp();
 
                                         rightPanel.add(comboBoxTime);
                                         comboBoxTime.setBounds(260, 250, 190, 50);
@@ -919,11 +864,7 @@ public class PatientScreen extends JFrame{
 
                             String time = (String) comboBoxTime.getSelectedItem() + ":00";
 
-                            try {
-                                Repository.modifyAppointment(appID, appointmentDate, time);
-                            } catch (SQLException throwables) {
-                                throwables.printStackTrace();
-                            }
+                            services.modifyAppointment(appID, appointmentDate, time);
 
                             leftPanel.removeAll();
                             leftPanel.setLayout(null);
@@ -933,11 +874,7 @@ public class PatientScreen extends JFrame{
 
                             if (!Objects.isNull(comboBoxTime)) rightPanel.remove(comboBoxTime);
 
-                            try {
-                                initializeBoxTimeModifyApp();
-                            } catch (SQLException throwables) {
-                                throwables.printStackTrace();
-                            }
+                            initializeBoxTimeModifyApp();
 
                             rightPanel.add(comboBoxTime);
                             comboBoxTime.setBounds(260, 250, 190, 50);
@@ -988,10 +925,11 @@ public class PatientScreen extends JFrame{
     }
 
 
-    public PatientScreen (String username) throws SQLException {
+    public PatientScreen (Services services, String username) {
 
+        this.services = services;
         this.username = username;
-        this.patientName = Services.getPatientName(username);
+        this.patientName = services.getPatientName(username);
 
         frame.setTitle("Patient Screen");
         frame.setSize(1000,800);
@@ -1031,10 +969,7 @@ public class PatientScreen extends JFrame{
     }
 
 
-    public static void main(String[] args) throws SQLException {
-
-        //String username = "tudor.campean";
-        //PatientScreen patientScreen = new PatientScreen(username);
+    public static void main(String[] args)  {
 
 
     }
