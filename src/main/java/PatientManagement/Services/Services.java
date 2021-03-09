@@ -1,137 +1,284 @@
 package PatientManagement.Services;
 
-import PatientManagement.Repository.DatabaseUtils;
+import PatientManagement.BaseClasses.Appointment;
+import PatientManagement.BaseClasses.Medic;
+import PatientManagement.BaseClasses.Patient;
+import PatientManagement.BaseClasses.PatientSheet;
+import PatientManagement.Repository.Repository;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.List;
 
 public class Services {
 
-    public static String verifyUser (String username, String password) throws SQLException {
-        // IF CREDENTIALS ARE CORRECT - RETURN PATIENT/MEDIC
-        // IF CREDENTIALS ARE INCORRECT - RETURN NULL
+    private Repository repository = null;
 
-        Connection con = DatabaseUtils.getConnection();
+    public Services () {
 
-        Statement statement1 = con.createStatement();
-        ResultSet resultSet = statement1.executeQuery("SELECT USER_USERNAME, USER_PASSWORD, USER_TYPE FROM USERS");
+        this.repository = new Repository();
 
-        String userSearch = null;
-        String passwordSearch = null;
-        String accountType = null;
+    }
 
-        while (resultSet.next()) {
 
-            userSearch = resultSet.getString(1);
-            passwordSearch = resultSet.getString(2);
+    public List<Medic> getMedics () {
 
-            if ((username.equals(userSearch)) && (password.equals(passwordSearch))) {
+        try {
 
-                accountType = resultSet.getString(3);
-                return accountType;
+            return repository.getMedics();
 
-            }
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return null;
 
         }
 
-        return accountType;
+    }
+
+    public List<Patient> getPatients () {
+
+        try {
+
+
+            return repository.getPatients();
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return null;
+        }
 
     }
 
-    public static boolean checkUsernameAvailability (String username) throws SQLException {
+    public List<PatientSheet> getMedicPatientSheets (String username) {
 
-        Connection con = DatabaseUtils.getConnection();
-        Statement statement = con.createStatement();
-        ResultSet rs = statement.executeQuery("SELECT USER_USERNAME FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+        try {
 
-        if(rs.next()) {
+            return repository.getMedicPatientSheets(username);
 
-            String searchUsername = rs.getString(1);
+        } catch (SQLException throwables) {
 
-            if(username.equals(searchUsername)) return false;
-            else return true;
+            throwables.printStackTrace();
+            return null;
 
-        } else return true;
-
+        }
 
     }
 
-    public static String getMedicName (String username) throws SQLException {
+    public List<PatientSheet> getPatientPatientSheets (String username) {
 
-        Connection con = DatabaseUtils.getConnection();
-        Statement statement1 = con.createStatement();
-        ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+        try {
 
-        int userID = 0;
+            return repository.getPatientPatientSheets(username);
 
-        if (rs1.next()) userID = rs1.getInt(1);
+        } catch (SQLException throwables) {
 
-        Statement statement2 = con.createStatement();
-        ResultSet rs2 = statement2.executeQuery("SELECT LAST_NAME, FIRST_NAME FROM MEDICS WHERE USER_ID = " + userID);
+            throwables.printStackTrace();
+            return null;
 
-        String medicName = null;
-
-        if (rs2.next()) medicName = "Dr. " + rs2.getString(1) + " " + rs2.getString(2);
-
-        return medicName;
+        }
 
     }
 
-    public static String getPatientName(String username) throws SQLException {
+    public List<Appointment> getMedicAppointments (String username) {
 
-        Connection con = DatabaseUtils.getConnection();
-        Statement statement1 = con.createStatement();
-        ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+        try {
 
-        int userID = 0;
+            return repository.getMedicAppointments(username);
 
-        if (rs1.next()) userID = rs1.getInt(1);
+        } catch (SQLException throwables) {
 
-        Statement statement2 = con.createStatement();
-        ResultSet rs2 = statement2.executeQuery("SELECT LAST_NAME, FIRST_NAME FROM PATIENTS WHERE USER_ID = " + userID);
+            throwables.printStackTrace();
+            return null;
 
-        String patientName = null;
-
-        if (rs2.next()) patientName = rs2.getString(1) + " " + rs2.getString(2);
-
-        return patientName;
+        }
 
     }
 
-    public static boolean checkDoctorTimeAvailability (int medicID, String month, String day, String time) throws SQLException {
+    public List<Appointment> getPatientAppointments (String username) {
 
-        Connection con = DatabaseUtils.getConnection();
-        Statement statement1 = con.createStatement();
-        ResultSet rs1 = statement1.executeQuery("SELECT APPOINTMENT_ID FROM APPOINTMENTS WHERE MEDIC_ID = " + medicID +
-                " AND APPOINTMENT_DATE = \"2021-" + month + "-" + day +"\" AND APPOINTMENT_TIME = \"" + time + "\"");
+        try {
 
-        int appID = 0;
+            return repository.getPatientAppointments(username);
 
-        if (rs1.next()) appID = 1;
+        } catch (SQLException throwables) {
 
-        if (appID == 0) return true;
-        else return false;
+            throwables.printStackTrace();
+            return null;
+        }
 
     }
 
+    public boolean addPatient (String last_name, String first_name, String birth_date, String username, String password) {
 
-    public static void main(String[] args) throws SQLException {
+        try {
 
-        // System.out.println(addPatient("Popa", "Florin", "2020-01-07", "testUser3", "testPassword2"));
-        // System.out.println(addMedic("NumeFamilie1", "Prenume1", "2020-01-08", "Cardiology", "username3", "password1"));
-        // addMedic("NumeFamilie2", "Prenume2", "2020-01-08", "Pneumology", "username2", "password2");
+            return repository.addPatient(last_name, first_name, birth_date, username, password);
 
-        // System.out.println(verifyUser("alexandru.paloseanu", "alexandruNR1"));
-        // System.out.println(verifyUser("alexandru.paloseanu", "alexandruNR2"));
-        // System.out.println(verifyUser("alexandru.paloseanu1", "alexandruNR1"));
+        } catch (SQLException throwables) {
 
-        //System.out.println(checkUsernameAvailability("alexandru.paloseanu"));
-        //System.out.println(checkUsernameAvailability("userNou"));
-        //System.out.println(checkUsernameAvailability("maria.moraru"));
+            throwables.printStackTrace();
+            return false;
 
-        //System.out.println(checkDoctorTimeAvailability(3, "04", "01", "11:00:00"));
+        }
+
+    }
+
+    public boolean addMedic (String last_name, String first_name, String birth_date, String specialization, String username, String password) {
+
+        try {
+
+            return repository.addMedic(last_name, first_name, birth_date, specialization, username, password);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return false;
+
+        }
+
+    }
+
+    public boolean addPatientSheet (String medicName, String patientName, String diagnosis, String treatment) {
+
+
+
+        try {
+
+            return repository.addPatientSheet(medicName, patientName, diagnosis, treatment);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public void modifyPatientSheet (int sheetID, String diagnosis, String treatment) {
+
+        try {
+            repository.modifyPatientSheet(sheetID, diagnosis, treatment);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+    public void markAppointment (int appID, String status) {
+
+        try {
+            repository.markAppointment(appID, status);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+    public void modifyAppointment (int appID, String date, String time) {
+
+        try {
+            repository.modifyAppointment(appID, date, time);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+    public void deleteAppointment (int appID) {
+
+        try {
+            repository.deleteAppointment(appID);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+    public void addAppointment (String patientUsername, int medicID, String appointmentDate, String appointmentTime) {
+
+        try {
+            repository.addAppointment(patientUsername, medicID, appointmentDate, appointmentTime);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+    }
+
+    public String verifyUser (String username, String password) {
+
+        try {
+
+            return repository.verifyUser(username, password);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public boolean checkUsernameAvailability (String username) {
+
+        try {
+
+            return repository.checkUsernameAvailability(username);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return false;
+        }
+
+    }
+
+    public String getMedicName (String username) {
+
+        try {
+
+            return repository.getMedicName(username);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return null;
+
+        }
+
+    }
+
+    public String getPatientName(String username) {
+
+        try {
+
+            return repository.getPatientName(username);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return null;
+
+        }
+
+    }
+
+    public boolean checkDoctorTimeAvailability (int medicID, String month, String day, String time) {
+
+        try {
+
+            return repository.checkDoctorTimeAvailability(medicID, month, day, time);
+
+        } catch (SQLException throwables) {
+
+            throwables.printStackTrace();
+            return false;
+
+        }
+
+    }
+
+    public void main(String[] args) {
+
 
 
     }

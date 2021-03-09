@@ -1,20 +1,22 @@
 package PatientManagement.GUI;
 
-import PatientManagement.Repository.Repository;
 import PatientManagement.Services.Services;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 
 public class CreateAccountScreen extends JFrame {
+
+    Services services = null;
 
     private JFrame frame = new JFrame();
     private Panel panel = new Panel();
 
-    public CreateAccountScreen () {
+    public CreateAccountScreen (Services services) {
+
+        this.services = services;
 
         frame.setTitle("Create an Account");
         frame.setSize(420,840);
@@ -261,67 +263,60 @@ public class CreateAccountScreen extends JFrame {
 
                     if (true) {
 
-                        try {
+                        if (services.checkUsernameAvailability(username)) {
 
-                            if (Services.checkUsernameAvailability(username)) {
+                            if (password.equals(password2)) {
 
-                                if (password.equals(password2)) {
+                                if (patientButton.isSelected()) {
 
-                                    if (patientButton.isSelected()) {
+                                    services.addPatient(lastName, firstName, birthDate, username, password);
 
-                                        Repository.addPatient(lastName, firstName, birthDate, username, password);
-
-                                        panel.add(accountCreatedLabel1);
-                                        panel.add(accountCreatedLabel2);
-                                        accountCreatedLabel1.setBounds(5, 610, 400, 30);
-                                        accountCreatedLabel2.setBounds(5, 640, 400, 30);
-                                        accountCreatedLabel1.setForeground(Color.GREEN);
-                                        accountCreatedLabel2.setForeground(Color.GREEN);
+                                    panel.add(accountCreatedLabel1);
+                                    panel.add(accountCreatedLabel2);
+                                    accountCreatedLabel1.setBounds(5, 610, 400, 30);
+                                    accountCreatedLabel2.setBounds(5, 640, 400, 30);
+                                    accountCreatedLabel1.setForeground(Color.GREEN);
+                                    accountCreatedLabel2.setForeground(Color.GREEN);
 
 
-                                    } else if (medicButton.isSelected()) {
+                                } else if (medicButton.isSelected()) {
 
-                                        Repository.addMedic(lastName, firstName, birthDate, specialization, username, password);
+                                    services.addMedic(lastName, firstName, birthDate, specialization, username, password);
 
-                                        panel.add(accountCreatedLabel1);
-                                        panel.add(accountCreatedLabel2);
-                                        accountCreatedLabel1.setBounds(5, 610, 400, 30);
-                                        accountCreatedLabel2.setBounds(5, 640, 400, 30);
-                                        accountCreatedLabel1.setForeground(Color.GREEN);
-                                        accountCreatedLabel2.setForeground(Color.GREEN);
-
-                                    }
-
-
-                                } else {
-
-                                    panel.add(wrongPasswordLabel1);
-                                    panel.add(wrongPasswordLabel2);
-                                    wrongPasswordLabel1.setBounds(5, 610, 400, 30);
-                                    wrongPasswordLabel2.setBounds(5, 640, 400, 30);
-                                    wrongPasswordLabel1.setForeground(Color.RED);
-                                    wrongPasswordLabel2.setForeground(Color.RED);
-                                    repaint();
+                                    panel.add(accountCreatedLabel1);
+                                    panel.add(accountCreatedLabel2);
+                                    accountCreatedLabel1.setBounds(5, 610, 400, 30);
+                                    accountCreatedLabel2.setBounds(5, 640, 400, 30);
+                                    accountCreatedLabel1.setForeground(Color.GREEN);
+                                    accountCreatedLabel2.setForeground(Color.GREEN);
 
                                 }
 
 
                             } else {
 
-                                panel.add(takenUsernameLabel1);
-                                panel.add(takenUsernameLabel2);
-                                takenUsernameLabel1.setBounds(5, 610, 400, 30);
-                                takenUsernameLabel2.setBounds(5, 640, 400, 30);
-                                takenUsernameLabel1.setForeground(Color.RED);
-                                takenUsernameLabel2.setForeground(Color.RED);
+                                panel.add(wrongPasswordLabel1);
+                                panel.add(wrongPasswordLabel2);
+                                wrongPasswordLabel1.setBounds(5, 610, 400, 30);
+                                wrongPasswordLabel2.setBounds(5, 640, 400, 30);
+                                wrongPasswordLabel1.setForeground(Color.RED);
+                                wrongPasswordLabel2.setForeground(Color.RED);
                                 repaint();
 
                             }
 
-                        } catch (SQLException throwables) {
-                            throwables.printStackTrace();
-                        }
 
+                        } else {
+
+                            panel.add(takenUsernameLabel1);
+                            panel.add(takenUsernameLabel2);
+                            takenUsernameLabel1.setBounds(5, 610, 400, 30);
+                            takenUsernameLabel2.setBounds(5, 640, 400, 30);
+                            takenUsernameLabel1.setForeground(Color.RED);
+                            takenUsernameLabel2.setForeground(Color.RED);
+                            repaint();
+
+                        }
                     }
                 }
             }
@@ -333,7 +328,7 @@ public class CreateAccountScreen extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 frame.dispose();
-                LoginScreen loginScreen = new LoginScreen();
+                LoginScreen loginScreen = new LoginScreen(services);
 
             }
         });
@@ -343,7 +338,7 @@ public class CreateAccountScreen extends JFrame {
 
     public static void main(String[] args) {
 
-        CreateAccountScreen screen = new CreateAccountScreen();
+        CreateAccountScreen screen = new CreateAccountScreen(new Services());
 
     }
 }

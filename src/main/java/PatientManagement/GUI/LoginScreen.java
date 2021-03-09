@@ -6,17 +6,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.SQLException;
 import java.util.Objects;
 
 public class LoginScreen extends JFrame {
+
+    Services services = null;
 
     private JFrame frame = new JFrame();
     private Panel panel = new Panel();
 
 
+    public LoginScreen(Services services) {
 
-    public LoginScreen() {
+        this.services = services;
 
         frame.setTitle("Login Screen");
         frame.setSize(300,400);
@@ -102,12 +104,7 @@ public class LoginScreen extends JFrame {
                 username = userNameField.getText();
                 password = passwordField.getText();
 
-                try {
-                    accountType = Services.verifyUser(username, password);
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-
+                accountType = services.verifyUser(username, password);
 
 
                 if (Objects.isNull(accountType)) {
@@ -126,26 +123,14 @@ public class LoginScreen extends JFrame {
 
                     frame.dispose();
 
-                    try {
-
-                        PatientScreen patientScreen = new PatientScreen(username);
-
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
+                    PatientScreen patientScreen = new PatientScreen(services, username);
 
 
                 } else if (accountType.equals("MEDIC")) {
 
                     frame.dispose();
 
-                    try {
-
-                        MedicScreen medicScreen = new MedicScreen(username);
-
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
+                    MedicScreen medicScreen = new MedicScreen(services, username);
 
                 }
 
@@ -158,7 +143,7 @@ public class LoginScreen extends JFrame {
             public void actionPerformed(ActionEvent e) {
 
                 frame.dispose();
-                CreateAccountScreen createAccountScreen = new CreateAccountScreen();
+                CreateAccountScreen createAccountScreen = new CreateAccountScreen(services);
 
 
             }
@@ -168,7 +153,7 @@ public class LoginScreen extends JFrame {
 
     public static void main(String[] args) {
 
-        LoginScreen loginScreen = new LoginScreen();
+        LoginScreen loginScreen = new LoginScreen(new Services());
 
     }
 }

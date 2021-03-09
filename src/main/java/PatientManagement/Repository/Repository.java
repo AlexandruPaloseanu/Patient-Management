@@ -12,32 +12,11 @@ import java.util.Objects;
 
 public class Repository {
 
-    public static List<User> getUsers () throws SQLException {
+    private Connection con = null;
 
-        Connection con = DatabaseUtils.getConnection();
+    public List<Medic> getMedics () throws SQLException {
 
-        Statement statement = con.createStatement();
-        ResultSet resultSet = statement.executeQuery("select * from users");
-
-        List<User> users = new ArrayList<User>();
-
-        while (resultSet.next()) {
-
-            users.add(new User(
-                    resultSet.getInt(1),
-                    resultSet.getString(2),
-                    resultSet.getString(3),
-                    resultSet.getString(4))
-            );
-        }
-
-        return users;
-
-    }
-
-    public static List<Medic> getMedics () throws SQLException {
-
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement = con.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from medics");
@@ -73,13 +52,14 @@ public class Repository {
             );
         }
 
+        con.close();
         return medics;
 
     }
 
-    public static List<Patient> getPatients () throws SQLException {
+    public List<Patient> getPatients () throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement = con.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from patients");
@@ -115,13 +95,14 @@ public class Repository {
 
         }
 
+        con.close();
         return patients;
 
     }
 
-    public static List<Appointment> getAppointments () throws SQLException {
+    public List<Appointment> getAppointments () throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement = con.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from appointments");
 
@@ -218,13 +199,14 @@ public class Repository {
 
         }
 
+        con.close();
         return appointments;
 
     }
 
-    public static List<PatientSheet> getPatientSheets () throws SQLException {
+    public List<PatientSheet> getPatientSheets () throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement = con.createStatement();
         ResultSet resultSet = statement.executeQuery("select * from patient_sheets");
 
@@ -320,17 +302,17 @@ public class Repository {
 
         }
 
+        con.close();
         return patientSheets;
     }
 
-
-    public static List<PatientSheet> getMedicPatientSheets (String username) throws SQLException {
+    public List<PatientSheet> getMedicPatientSheets (String username) throws SQLException {
 
         List<PatientSheet> fullList = getPatientSheets();
 
         List<PatientSheet> medicPatientSheets = new ArrayList<PatientSheet>();
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement1 = con.createStatement();
         ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
 
@@ -353,17 +335,18 @@ public class Repository {
             }
         }
 
+        con.close();
         return medicPatientSheets;
 
     }
 
-    public static List<PatientSheet> getPatientPatientSheets (String username) throws SQLException {
+    public List<PatientSheet> getPatientPatientSheets (String username) throws SQLException {
 
         List<PatientSheet> fullList = getPatientSheets();
 
         List<PatientSheet> patientPatientSheets = new ArrayList<PatientSheet>();
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement1 = con.createStatement();
         ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
 
@@ -386,18 +369,18 @@ public class Repository {
             }
         }
 
+        con.close();
         return patientPatientSheets;
 
     }
 
-
-    public static List<Appointment> getMedicAppointments (String username) throws SQLException {
+    public List<Appointment> getMedicAppointments (String username) throws SQLException {
 
         List<Appointment> fullList = getAppointments();
 
         List<Appointment> medicAppointments = new ArrayList<>();
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement1 = con.createStatement();
         ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
@@ -421,17 +404,18 @@ public class Repository {
             }
         }
 
+        con.close();
         return medicAppointments;
 
     }
 
-    public static List<Appointment> getPatientAppointments (String username) throws SQLException {
+    public List<Appointment> getPatientAppointments (String username) throws SQLException {
 
         List<Appointment> fullList = getAppointments();
 
         List<Appointment> patientAppointments = new ArrayList<>();
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement1 = con.createStatement();
         ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
@@ -455,14 +439,14 @@ public class Repository {
             }
         }
 
+        con.close();
         return patientAppointments;
 
     }
 
+    public boolean addPatient (String last_name, String first_name, String birth_date, String username, String password) throws SQLException {
 
-    public static boolean addPatient (String last_name, String first_name, String birth_date, String username, String password) throws SQLException {
-
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement = con.createStatement();
 
@@ -471,7 +455,12 @@ public class Repository {
         while (rs.next()) {
 
             String newUser = rs.getString(1);
-            if (username.equals(newUser)) return false;
+
+            if (username.equals(newUser)) {
+
+                con.close();
+                return false;
+            }
         }
 
         Statement statement1 = con.createStatement();
@@ -494,12 +483,13 @@ public class Repository {
         statement3.execute("" +
                 "INSERT INTO PATIENT_MANAGEMENT.PATIENTS  VALUES (" + patientID + ", \"" + last_name + "\", \""+ first_name + "\", \"" + birth_date + "\", " + userID + ")");
 
+        con.close();
         return true;
     }
 
-    public static boolean addMedic (String last_name, String first_name, String birth_date, String specialization, String username, String password) throws SQLException {
+    public boolean addMedic (String last_name, String first_name, String birth_date, String specialization, String username, String password) throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement = con.createStatement();
 
@@ -508,7 +498,12 @@ public class Repository {
         while (rs.next()) {
 
             String newUser = rs.getString(1);
-            if (username.equals(newUser)) return false;
+            if (username.equals(newUser)) {
+
+                con.close();
+                return false;
+
+            }
         }
 
         Statement statement1 = con.createStatement();
@@ -529,13 +524,13 @@ public class Repository {
         statement3.execute(
                 "INSERT INTO PATIENT_MANAGEMENT.MEDICS VALUES (" + medicID + ", \"" + last_name + "\", \"" + first_name + "\", \"" + birth_date + "\", \"" + specialization + "\", " + userID + ")");
 
+        con.close();
         return true;
     }
 
+    public boolean addPatientSheet (String medicName, String patientName, String diagnosis, String treatment) throws SQLException {
 
-    public static boolean addPatientSheet (String medicName, String patientName, String diagnosis, String treatment) throws SQLException {
-
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         String[] medicStrings = medicName.split(" ");
         String[] patientStrings = patientName.split(" ");
@@ -567,20 +562,33 @@ public class Repository {
                     Statement statement4 = con.createStatement();
                     statement4.execute("INSERT INTO PATIENT_SHEETS VALUES (" + patientSheetID + ", " + patientID + ", " + medicID + ", \"" + diagnosis + "\", \"" + treatment + "\")");
 
+                    con.close();
                     return true;
 
-                } else return false;
+                } else {
 
-            } else return false;
+                    con.close();
+                    return false;
+                }
 
-        } else return false;
+            } else {
+
+                con.close();
+                return false;
+            }
+
+        } else {
+
+            con.close();
+            return false;
+        }
 
 
     }
 
-    public static void modifyPatientSheet (int sheetID, String diagnosis, String treatment) throws SQLException {
+    public void modifyPatientSheet (int sheetID, String diagnosis, String treatment) throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement = con.createStatement();
 
         if (Objects.isNull(diagnosis) && Objects.isNull(treatment)) {
@@ -599,12 +607,13 @@ public class Repository {
 
         }
 
+        con.close();
+
     }
 
+    public void markAppointment (int appID, String status) throws SQLException {
 
-    public static void markAppointment (int appID, String status) throws SQLException {
-
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement1 = con.createStatement();
 
         ResultSet rs1 = statement1.executeQuery("SELECT APPOINTMENT_ID FROM APPOINTMENTS WHERE APPOINTMENT_ID = " + appID);
@@ -617,11 +626,13 @@ public class Repository {
 
         }
 
+        con.close();
+
     }
 
-    public static void modifyAppointment (int appID, String date, String time) throws SQLException {
+    public void modifyAppointment (int appID, String date, String time) throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement1 = con.createStatement();
 
         ResultSet rs1 = statement1.executeQuery("SELECT APPOINTMENT_ID FROM APPOINTMENTS WHERE APPOINTMENT_ID = " + appID);
@@ -634,11 +645,13 @@ public class Repository {
 
         }
 
+        con.close();
+
     }
 
-    public static void deleteAppointment (int appID) throws SQLException {
+    public void deleteAppointment (int appID) throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
         Statement statement1 = con.createStatement();
 
         ResultSet rs1 = statement1.executeQuery("SELECT APPOINTMENT_ID FROM APPOINTMENTS WHERE APPOINTMENT_ID = " + appID);
@@ -651,11 +664,13 @@ public class Repository {
 
         }
 
+        con.close();
+
     }
 
-    public static void addAppointment (String patientUsername, int medicID, String appointmentDate, String appointmentTime) throws SQLException {
+    public void addAppointment (String patientUsername, int medicID, String appointmentDate, String appointmentTime) throws SQLException {
 
-        Connection con = DatabaseUtils.getConnection();
+        con = DatabaseUtils.getConnection();
 
         Statement statement1 = con.createStatement();
         ResultSet rs1 = statement1.executeQuery("SELECT MAX(APPOINTMENT_ID) FROM APPOINTMENTS");
@@ -693,29 +708,146 @@ public class Repository {
             }
         }
 
+
+        con.close();
+
+    }
+
+    public String verifyUser (String username, String password) throws SQLException {
+        // IF CREDENTIALS ARE CORRECT - RETURN PATIENT/MEDIC
+        // IF CREDENTIALS ARE INCORRECT - RETURN NULL
+
+        con = DatabaseUtils.getConnection();
+
+        Statement statement1 = con.createStatement();
+        ResultSet resultSet = statement1.executeQuery("SELECT USER_USERNAME, USER_PASSWORD, USER_TYPE FROM USERS");
+
+        String userSearch = null;
+        String passwordSearch = null;
+        String accountType = null;
+
+        while (resultSet.next()) {
+
+            userSearch = resultSet.getString(1);
+            passwordSearch = resultSet.getString(2);
+
+            if ((username.equals(userSearch)) && (password.equals(passwordSearch))) {
+
+                accountType = resultSet.getString(3);
+
+                con.close();
+                return accountType;
+
+            }
+
+        }
+
+        con.close();
+        return accountType;
+
+    }
+
+    public boolean checkUsernameAvailability (String username) throws SQLException {
+
+        con = DatabaseUtils.getConnection();
+        Statement statement = con.createStatement();
+        ResultSet rs = statement.executeQuery("SELECT USER_USERNAME FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+
+        if(rs.next()) {
+
+            String searchUsername = rs.getString(1);
+
+            if(username.equals(searchUsername)) {
+
+                con.close();
+                return false;
+            } else {
+
+                con.close();
+                return true;
+            }
+
+        } else {
+
+            con.close();
+            return true;
+        }
+
+
+    }
+
+    public String getMedicName (String username) throws SQLException {
+
+        con = DatabaseUtils.getConnection();
+        Statement statement1 = con.createStatement();
+        ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+
+        int userID = 0;
+
+        if (rs1.next()) userID = rs1.getInt(1);
+
+        Statement statement2 = con.createStatement();
+        ResultSet rs2 = statement2.executeQuery("SELECT LAST_NAME, FIRST_NAME FROM MEDICS WHERE USER_ID = " + userID);
+
+        String medicName = null;
+
+        if (rs2.next()) medicName = "Dr. " + rs2.getString(1) + " " + rs2.getString(2);
+
+        con.close();
+        return medicName;
+
+    }
+
+    public String getPatientName(String username) throws SQLException {
+
+        con = DatabaseUtils.getConnection();
+        Statement statement1 = con.createStatement();
+        ResultSet rs1 = statement1.executeQuery("SELECT USER_ID FROM USERS WHERE USER_USERNAME = \"" + username + "\"");
+
+        int userID = 0;
+
+        if (rs1.next()) userID = rs1.getInt(1);
+
+        Statement statement2 = con.createStatement();
+        ResultSet rs2 = statement2.executeQuery("SELECT LAST_NAME, FIRST_NAME FROM PATIENTS WHERE USER_ID = " + userID);
+
+        String patientName = null;
+
+        if (rs2.next()) patientName = rs2.getString(1) + " " + rs2.getString(2);
+
+        con.close();
+        return patientName;
+
+    }
+
+    public boolean checkDoctorTimeAvailability (int medicID, String month, String day, String time) throws SQLException {
+
+        con = DatabaseUtils.getConnection();
+        Statement statement1 = con.createStatement();
+        ResultSet rs1 = statement1.executeQuery("SELECT APPOINTMENT_ID FROM APPOINTMENTS WHERE MEDIC_ID = " + medicID +
+                " AND APPOINTMENT_DATE = \"2021-" + month + "-" + day +"\" AND APPOINTMENT_TIME = \"" + time + "\"");
+
+        int appID = 0;
+
+        if (rs1.next()) appID = 1;
+
+        if (appID == 0) {
+
+            con.close();
+            return true;
+        }
+        else {
+
+            con.close();
+            return false;
+        }
+
     }
 
 
-    public static void main(String[] args) throws SQLException {
+    public void main(String[] args) {
 
-        // List<PatientManagement.BaseClasses.User> users = getUsers();
-        // System.out.println(users);
 
-        // List<PatientManagement.BaseClasses.Medic> medics = getMedics();
-        // System.out.println(medics);
-
-        // List<PatientManagement.BaseClasses.Patient> patients = getPatients();
-        // System.out.println(patients);
-
-        // List<PatientManagement.BaseClasses.Appointment> appointments = getAppointments();
-        // System.out.println(appointments);
-
-        // List<PatientManagement.BaseClasses.PatientSheet> patientSheets = getPatientSheets();
-        // System.out.println(patientSheets);
-
-        //addPatientSheet("Paloseanu Alexandru", "Popescu Calin", "test", "test");
-
-        //addAppointment("tudor.campean", 3, "2021-04-01", "10:00:00");
 
     }
 }
