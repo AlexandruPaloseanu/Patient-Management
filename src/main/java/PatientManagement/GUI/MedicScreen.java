@@ -918,6 +918,8 @@ public class MedicScreen extends JFrame{
 
     public static void main(String[] args) {
 
+        new MedicScreen(new Services(), "alexandru.paloseanu");
+
 
     }
 }
